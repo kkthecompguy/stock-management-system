@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}
+  {{title}}
+{% endblock %}
+
+{% block content %}
+{% if messages %}
+  {% for message in messages %}
+    <div class="alert alert-{{message.tags}}"><p class="text-center">{{message}}</p></div>
+  {% endfor %}
+{% endif %}
+
+<div>
+  <h1 class="header mt-3">LIST OF ITEMS</h1>
+  <div class="row">
+    <div class="col-sm-2 col-md-2 col-lg-2">
+      <form method="POST" action="">
+        {% csrf_token %}
+        {{form|crispy}}
+        <input type="submit" name="Search" id="Search" value="Search" class="btn btn-primary btn-block">
+      </form>
+      <a href="{% url 'add-items' %}" class="btn btn-info btn-block mt-2">Add Item</a>
+      <a href="{% url 'list-history' %}" class="btn btn-info btn-block">List History</a>
+    </div>
+    <div class="col-md-10 col-sm-10 col-lg-10 mx-auto">
+      
+      <div class="display-table">
+        <table class="table table-responsive mt-2">
+          <thead>
+            <tr>
+              <th>COUNT</th>
+              <th>CATEGORY</th>
+              <th>ITEM NAME</th>
+              <th>QUANTITY IN STORE</th>
+              <th>REORDER LEVEL</th>
+              <th>CREATED AT</th>
+              <th>LAST UPDATED</th>
+              <th>EDIT</th>
+              <th>DELETE</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for obj in objects %}
+              <tr>
+                <td>{{forloop.counter}}</td>
+                <td>{{obj.category}}</td>
+                <td><a href="{% url 'stock-detail' obj.pk %}">{{obj.item_name}}</a></td>
+                <td><a href="{% url 'stock-detail' obj.pk %}">{{obj.quantity}}</a></td>
+                <td>
+                  {% if obj.quantity <= obj.reorder_level %}
+                    <div class="bg-warning"><a href="{% url 'reorder-level' obj.pk %}">{{obj.reorder_level}}</a></div>
+                  {% else %}
+                    <a href="{% url 'reorder-level' obj.pk %}">{{obj.reorder_level}}</a>
+                  {% endif %}
+                </td>
+                <td>{{obj.created_at}}</td>
+                <td>{{obj.last_updated}}</td>
+                <td><a href="{% url 'update-items' obj.pk %}"><i class="fas fa-pencil-alt"></i></a></td>
+                <td><a href="{% url 'delete-items' obj.pk %}"><i class="fas fa-trash"></i></a></td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
